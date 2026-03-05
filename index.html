@@ -3767,14 +3767,17 @@ display:none;
 </div>
 </div>
 <script>
-function filterSongs() {
-const query = document.getElementById('search').value.toLowerCase();
-const items = document.querySelectorAll('.song-item');
-items.forEach(item => {
-const text = item.textContent.toLowerCase();
-item.classList.toggle('hidden', !text.includes(query));
+
+function filterSongs(){
+const query=document.getElementById("search").value.toLowerCase();
+const songs=document.querySelectorAll(".song-item");
+
+songs.forEach(song=>{
+const text=song.textContent.toLowerCase();
+song.classList.toggle("hidden",!text.includes(query));
 });
 }
+
 </script>
 </body>
 </html>
