@@ -230,6 +230,24 @@
       .artist { font-size: 13px; }
       .count { font-size: 12px; }
     }
+  .toast {
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-size: 14px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.toast.show {
+  opacity: 1;
+}
   </style>
   <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#f59fbc">
@@ -419,11 +437,32 @@
     });
 
     render();
+ document.addEventListener("click", function(e){
+
+  const item = e.target.closest(".song-item");
+  if(!item) return;
+
+  const title = item.querySelector(".title")?.innerText || "";
+  const artist = item.querySelector(".artist")?.innerText || "";
+
+  const text = title + " / " + artist;
+
+  navigator.clipboard.writeText(text);
+
+  const toast = document.getElementById("toast");
+  toast.classList.add("show");
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 1200);
+
+});
   </script>
 <script>
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./service-worker.js');
 }
 </script>
+<div id="toast" class="toast">コピーしました</div>
 </body>
 </html>
