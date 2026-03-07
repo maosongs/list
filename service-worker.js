@@ -1,11 +1,28 @@
-self.addEventListener('install', (event) => {
-  self.skipWaiting();
+const CACHE_NAME = "mao-list-v2";
+
+const urlsToCache = [
+  "./",
+  "./index.html",
+  "./manifest.json",
+  "./header.jpg",
+  "./icon-192.png",
+  "./icon-512.png"
+];
+
+self.addEventListener("install", event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => {
+        return cache.addAll(urlsToCache);
+      })
+  );
 });
 
-self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim());
-});
-
-self.addEventListener('fetch', (event) => {
-  // いまは何もしないけど、PWA判定と将来の拡張用に残す
+self.addEventListener("fetch", event => {
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => {
+        return response || fetch(event.request);
+      })
+  );
 });
