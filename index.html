@@ -231,6 +231,8 @@
       .count { font-size: 12px; }
     }
   </style>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#f5b6c8">
 </head>
 <body>
   <div class="app">
@@ -417,5 +419,10 @@
 
     render();
   </script>
+  <script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js');
+}
+</script>
 </body>
 </html>
