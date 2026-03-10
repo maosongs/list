@@ -1,4 +1,4 @@
-const CACHE_NAME = "mao-list-v2";
+const CACHE_NAME = "mao-list-v3";
 
 const urlsToCache = [
   "./",
