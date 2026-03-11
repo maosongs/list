@@ -152,19 +152,25 @@
       display: grid;
       gap: 10px;
     }
-    .song-item {
-      display: grid;
-      grid-template-columns: 42px 1fr auto;
-      gap: 12px;
-      align-items: start;
-      background: var(--card);
-      border: 1px solid #f6dbe5;
-      border-radius: 18px;
-      padding: 12px 13px;
-      box-shadow: var(--shadow);
-      scroll-margin-top: 174px;
-    }
-    .initial {
+.song-item {
+  display: grid;
+  grid-template-columns: 42px 1fr auto;
+  gap: 12px;
+  align-items: start;
+  background: var(--card);
+  border: 1px solid #f6dbe5;
+  border-radius: 18px;
+  padding: 12px 13px;
+  box-shadow: var(--shadow);
+  scroll-margin-top: 174px;
+
+  cursor: pointer;
+  transition: transform .08s ease;
+}
+
+.song-item:active {
+  transform: scale(.97);
+}    .initial {
       width: 42px;
       height: 42px;
       border-radius: 14px;
@@ -248,7 +254,101 @@
 .toast.show {
   opacity: 1;
 }
-  </style>
+  
+/* ===== SOCIAL ICON BAR ===== */
+.social-grid{
+display:flex;
+gap:18px;
+overflow-x:auto;
+padding:8px 4px 12px;
+margin-top:6px;
+}
+.social-grid::-webkit-scrollbar{display:none;}
+
+.social-item{
+flex:0 0 auto;
+text-align:center;
+font-size:12px;
+font-weight:600;
+color:#555;
+text-decoration:none;
+}
+
+.social-item img{
+width:42px;
+height:42px;
+display:block;
+margin:0 auto 6px;
+object-fit:cover;
+border-radius:50%;
+}
+
+/* brand color circles */
+.youtube img{background:#FF0000;}
+.instagram img{background:#E4405F;}
+.tiktok img{background:#000000;}
+.spotify img{background:#1DB954;}
+.lyrics img{background:#f59fbc;}
+.shop img{background:#ff9f43;}
+
+.social-item img:hover{
+transform:scale(1.08);
+}
+
+/* ===== RANDOM BUTTON ===== */
+.random-btn{
+margin:6px 0 12px;
+background:linear-gradient(135deg,#f59fbc,#ec6d96);
+color:#fff;
+border:none;
+border-radius:14px;
+padding:10px 14px;
+font-weight:700;
+cursor:pointer;
+}
+
+/* ===== RECENT REQUEST ===== */
+.recent-box{
+background:#fff;
+border:1px solid #f6dbe5;
+border-radius:16px;
+padding:10px 12px;
+margin-bottom:10px;
+box-shadow:0 6px 16px rgba(0,0,0,.08);
+}
+.recent-title{
+font-size:13px;
+color:#7b6c74;
+font-weight:700;
+margin-bottom:6px;
+}
+.recent-list{
+display:flex;
+flex-direction:column;
+gap:4px;
+font-size:14px;
+}
+
+/* ===== TOP BUTTON ===== */
+.top-btn{
+position:fixed;
+right:16px;
+bottom:22px;
+width:46px;
+height:46px;
+border-radius:50%;
+background:#f59fbc;
+color:#fff;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:18px;
+box-shadow:0 6px 16px rgba(0,0,0,.25);
+cursor:pointer;
+z-index:999;
+}
+
+</style>
   <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#f59fbc">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -266,7 +366,50 @@
           <input id="searchBox" type="text" placeholder="曲名・アーティスト・メモで検索">
         </div>
 
-        <div class="top-row">
+        
+<div class="recent-box">
+<div class="recent-title">最近リクエストされた曲</div>
+<div class="recent-list" id="recentList"></div>
+<button onclick="localStorage.removeItem('recentSongs');renderRecent();" style="margin-top:6px;font-size:12px;border:none;background:#f2d7e1;padding:6px 10px;border-radius:8px;cursor:pointer;">
+履歴リセット
+</button>
+</div>
+
+<div class="social-grid">
+
+<a class="social-item youtube" href="https://youtube.com/@user-lt9rq3dk8z" target="_blank">
+<img src="youtube.png">
+YouTube
+</a>
+
+<a class="social-item instagram" href="https://www.instagram.com/poyoyon1103/" target="_blank">
+<img src="Instagram.png">
+Instagram
+</a>
+
+<a class="social-item tiktok" href="https://www.tiktok.com/@poyoyonmao1103" target="_blank">
+<img src="tiktok.png">
+TikTok
+</a>
+
+<a class="social-item spotify" href="#" target="_blank">
+<img src="Spotify.png">
+Spotify
+</a>
+
+<a class="social-item lyrics" href="https://docs.google.com/document/d/17Ikg6M8QHJrJtnT0rvY4SiBiFIknoABO/edit" target="_blank">
+<img src="lyrics.png">
+歌詞
+</a>
+
+<a class="social-item shop" href="https://sswmao.base.shop/" target="_blank">
+<img src="shop.png">
+Shop
+</a>
+
+</div>
+
+<div class="top-row">
           <div class="tabs">
             <button class="tab active" data-mode="all">全リスト</button>
             <button class="tab" data-mode="favorites">お気に入り</button>
@@ -1358,12 +1501,97 @@
   }, 1200);
 
 });
-  </script>
+  
+
+function updateRecent(song){
+let list = JSON.parse(localStorage.getItem("recentSongs") || "[]");
+list = list.filter(s => s !== song);
+list.unshift(song);
+list = list.slice(0,5);
+localStorage.setItem("recentSongs", JSON.stringify(list));
+renderRecent();
+}
+
+function renderRecent(){
+const box = document.getElementById("recentList");
+if(!box) return;
+let list = JSON.parse(localStorage.getItem("recentSongs") || "[]");
+box.innerHTML = list.map(s=>"<div>"+s+"</div>").join("");
+}
+
+document.addEventListener("DOMContentLoaded",renderRecent);
+
+</script>
 <script>
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./service-worker.js');
 }
+
+function updateRecent(song){
+let list = JSON.parse(localStorage.getItem("recentSongs") || "[]");
+list = list.filter(s => s !== song);
+list.unshift(song);
+list = list.slice(0,5);
+localStorage.setItem("recentSongs", JSON.stringify(list));
+renderRecent();
+}
+
+function renderRecent(){
+const box = document.getElementById("recentList");
+if(!box) return;
+let list = JSON.parse(localStorage.getItem("recentSongs") || "[]");
+box.innerHTML = list.map(s=>"<div>"+s+"</div>").join("");
+}
+
+document.addEventListener("DOMContentLoaded",renderRecent);
+
+
+/* ↓↓↓ 曲タップでコピー機能 ↓↓↓ */
+
+let pressTimer;
+
+function copySong(item){
+
+  const title = item.querySelector(".title")?.innerText || "";
+  const artist = item.querySelector(".artist")?.innerText || "";
+  const text = `リクエスト：${title} / ${artist}`;
+
+  navigator.clipboard.writeText(text);
+
+  const toast = document.getElementById("toast");
+  toast.innerText = "コピーしました\n" + text;
+  toast.classList.add("show");
+
+  setTimeout(()=>toast.classList.remove("show"),2000);
+}
+
+/* スマホ長押し */
+
+document.addEventListener("touchstart", function(e){
+
+  const item = e.target.closest(".song-item");
+  if(!item) return;
+
+  pressTimer = setTimeout(()=>copySong(item),600);
+
+});
+
+document.addEventListener("touchend", ()=> clearTimeout(pressTimer));
+document.addEventListener("touchmove", ()=> clearTimeout(pressTimer));
+
+/* PCクリック */
+
+document.addEventListener("click", function(e){
+
+  const item = e.target.closest(".song-item");
+  if(!item) return;
+
+  copySong(item);
+
+});
 </script>
+
 <div id="toast" class="toast">コピーしました</div>
+<div class="top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
 </body>
 </html>
